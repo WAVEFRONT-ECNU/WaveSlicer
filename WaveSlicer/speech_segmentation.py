@@ -1,5 +1,5 @@
 import numpy as np
-import voice_activity_detect as vad
+import WaveSlicer.voice_activity_detect as vad
 import librosa
 # import matplotlib.pyplot as plt
 

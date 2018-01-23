@@ -1,7 +1,6 @@
 # -*- coding:UTF-8 -*-
 
-from __future__ import print_function
-import speech_segmentation as seg
+import WaveSlicer.speech_segmentation as seg
 
 frame_size = 256
 frame_shift = 128
