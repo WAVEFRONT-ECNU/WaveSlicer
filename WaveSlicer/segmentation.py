@@ -74,23 +74,26 @@ def multi_segmentation(y, sr, frame_size=256, frame_shift=128, iscut_head_and_ta
     seg_point = np.insert(seg_point, 0, 0)
     seg_point = np.append(seg_point, len(y))
     rangeLoop = range(len(seg_point) - 1)
-
+    #cut_segpoint = []
     output_segpoint = []
 
     if iscut_head_and_tail:
-        cut_segpoint = [0]
         for i in rangeLoop:
             temp = y[seg_point[i]:seg_point[i + 1]]
             x1, x2 = vad.vad(temp, sr=sr, framelen=frame_size, frameshift=frame_shift)
             if len(x1) == 0 or len(x2) == 0:
                 continue
-            elif seg_point[i + 1] == len(y):
-                continue
+            # elif seg_point[i + 1] == len(y):
+                # continue
             else:
-                cut_segpoint.append(seg_point[i + 1])
-        cut_segpoint.append(len(y))
-        output_segpoint = cut_segpoint
+                # cut_segpoint.append(seg_point[i + 1])
+                output_segpoint.append([seg_point[i],seg_point[i+1]])
+        # cut_segpoint.append(len(y))
+        # output_segpoint = cut_segpoint
+        # TODO 修复丢失最后一段的问题
     else:
-        output_segpoint = seg_point
+        for i in rangeLoop:
+            output_segpoint.append([seg_point[i], seg_point[i + 1]])
+        # output_segpoint = seg_point
 
     return (np.asarray(output_segpoint) / float(sr))
