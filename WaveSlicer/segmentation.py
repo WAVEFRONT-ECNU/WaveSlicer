@@ -90,7 +90,6 @@ def multi_segmentation(y, sr, frame_size=256, frame_shift=128, iscut_head_and_ta
                 output_segpoint.append([seg_point[i],seg_point[i+1]])
         # cut_segpoint.append(len(y))
         # output_segpoint = cut_segpoint
-        # TODO 修复丢失最后一段的问题
     else:
         for i in rangeLoop:
             output_segpoint.append([seg_point[i], seg_point[i + 1]])
