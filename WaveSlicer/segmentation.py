@@ -28,7 +28,7 @@ def compute_bic(mfcc_v, delta):
         det2 = max(np.prod(np.maximum(sigma2, eps)), realmin)
 
         BIC = 0.5 * (n * np.log(det0) - index * np.log(det1) - (n - index) * np.log(det2)) - 0.5 * (
-                    m + 0.5 * m * (m + 1)) * np.log(n)
+                m + 0.5 * m * (m + 1)) * np.log(n)
         x[iter] = BIC
         iter = iter + 1
 
@@ -65,8 +65,7 @@ def speech_segmentation(mfccs):
     return np.array(store_cp)
 
 
-def multi_segmentation(y, sr, frame_size=256, frame_shift=128, iscut_head_and_tail=True):
-
+def multi_segmentation(y, sr, frame_size=256, frame_shift=128, is_only_have_voice=True):
     mfccs = librosa.feature.mfcc(y, sr, n_mfcc=12, hop_length=frame_shift, n_fft=frame_size)
     seg_point = speech_segmentation(mfccs / mfccs.max())
 
@@ -74,20 +73,20 @@ def multi_segmentation(y, sr, frame_size=256, frame_shift=128, iscut_head_and_ta
     seg_point = np.insert(seg_point, 0, 0)
     seg_point = np.append(seg_point, len(y))
     rangeLoop = range(len(seg_point) - 1)
-    #cut_segpoint = []
+    # cut_segpoint = []
     output_segpoint = []
 
-    if iscut_head_and_tail:
+    if is_only_have_voice:
         for i in rangeLoop:
             temp = y[seg_point[i]:seg_point[i + 1]]
             x1, x2 = vad.vad(temp, sr=sr, framelen=frame_size, frameshift=frame_shift)
             if len(x1) == 0 or len(x2) == 0:
                 continue
             # elif seg_point[i + 1] == len(y):
-                # continue
+            # continue
             else:
                 # cut_segpoint.append(seg_point[i + 1])
-                output_segpoint.append([seg_point[i],seg_point[i+1]])
+                output_segpoint.append([seg_point[i], seg_point[i + 1]])
         # cut_segpoint.append(len(y))
         # output_segpoint = cut_segpoint
     else:

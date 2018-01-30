@@ -2,7 +2,7 @@ import numpy as np
 import scipy.signal as signal
 
 
-def vad(x,framelen = None, sr = None, frameshift = None, plot = False):
+def vad(x, framelen=None, sr=None, frameshift=None, plot=False):
     if sr is None:
         sr = 16000
     if framelen is None:
@@ -11,27 +11,27 @@ def vad(x,framelen = None, sr = None, frameshift = None, plot = False):
         frameshift = 128
     amp_th1 = 8
     amp_th2 = 20
-    zcr_th  = 5
+    zcr_th = 5
 
     maxsilence = 8
-    minlen     = 15
-    status     = 0
-    count      = 0
-    silence    = 0
+    minlen = 15
+    status = 0
+    count = 0
+    silence = 0
 
-    x = x/np.absolute(x).max()
+    x = x / np.absolute(x).max()
 
-    tmp1 = enframe(x[0:(len(x)-1)], framelen, frameshift)
-    tmp2 = enframe(x[1:(len(x)-1)], framelen, frameshift)
-    signs = (tmp1* tmp2) < 0
+    tmp1 = enframe(x[0:(len(x) - 1)], framelen, frameshift)
+    tmp2 = enframe(x[1:(len(x) - 1)], framelen, frameshift)
+    signs = (tmp1 * tmp2) < 0
     diffs = (tmp1 - tmp2) > 0.05
-    zcr = np.sum(signs* diffs, axis=1)
+    zcr = np.sum(signs * diffs, axis=1)
 
     filter_coeff = np.array([1, -0.9375])
-    pre_emphasis = signal.convolve(x,filter_coeff)[0:len(x)]
+    pre_emphasis = signal.convolve(x, filter_coeff)[0:len(x)]
     amp = np.sum(np.absolute(enframe(pre_emphasis, framelen, frameshift)), axis=1)
 
-    amp_th1 = min(amp_th1, amp.max()/ 3)
+    amp_th1 = min(amp_th1, amp.max() / 3)
     amp_th2 = min(amp_th2, amp.max() / 8)
 
     x1 = []
@@ -45,7 +45,7 @@ def vad(x,framelen = None, sr = None, frameshift = None, plot = False):
                 status = 2
                 silence = 0
                 count = count + 1
-            elif amp[n] > amp_th2 or zcr[n]>zcr_th:
+            elif amp[n] > amp_th2 or zcr[n] > zcr_th:
                 status = 1
                 count = count + 1
             else:
@@ -53,7 +53,7 @@ def vad(x,framelen = None, sr = None, frameshift = None, plot = False):
                 count = 0
             continue
         if status == 2:
-            if amp[n] > amp_th2 or zcr[n]>zcr_th:
+            if amp[n] > amp_th2 or zcr[n] > zcr_th:
                 count = count + 1
             else:
                 silence = silence + 1
@@ -69,15 +69,15 @@ def vad(x,framelen = None, sr = None, frameshift = None, plot = False):
                     x2.append(x1[t] + count - 1)
                     t = t + 1
 
-    return x1,x2
+    return x1, x2
 
 
-def enframe(x,framelen, frameshift):
+def enframe(x, framelen, frameshift):
     xlen = len(x)
-    nf   = (int)((xlen-framelen+frameshift)/frameshift)
-    f    = np.zeros((nf,framelen), dtype=np.float32)
-    indf = frameshift * (np.arange(0,nf)).reshape(nf,1)
-    inds = np.arange(0,framelen).reshape(1,framelen)
-    indall = np.tile(indf, (1, framelen))+np.tile(inds, (nf, 1))
+    nf = (int)((xlen - framelen + frameshift) / frameshift)
+    f = np.zeros((nf, framelen), dtype=np.float32)
+    indf = frameshift * (np.arange(0, nf)).reshape(nf, 1)
+    inds = np.arange(0, framelen).reshape(1, framelen)
+    indall = np.tile(indf, (1, framelen)) + np.tile(inds, (nf, 1))
     f = x[indall]
     return f
