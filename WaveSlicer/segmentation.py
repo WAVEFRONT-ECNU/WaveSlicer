@@ -78,7 +78,7 @@ def multi_segmentation(y, sr, frame_size=256, frame_shift=128, is_only_have_voic
 
     if is_only_have_voice:
         for i in rangeLoop:
-            temp = y[seg_point[i]:seg_point[i + 1]]
+            temp = y[int(seg_point[i]):int(seg_point[i + 1])]
             x1, x2 = vad.vad(temp, sr=sr, framelen=frame_size, frameshift=frame_shift)
             if len(x1) == 0 or len(x2) == 0:
                 continue

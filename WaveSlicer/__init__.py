@@ -2,7 +2,7 @@ import WaveSlicer.import_file
 import WaveSlicer.import_stream
 import WaveSlicer.segmentation
 import WaveSlicer.save
-import numpy
+import numpy as np
 
 
 def cut_audio_fromfile(path, outpath, name):
@@ -13,8 +13,8 @@ def cut_audio_fromfile(path, outpath, name):
 
 
 def cut_audio_fromstream(outpath, name):
-    sr = 14400
-    filenub = 0
+    sr = 16000
+    filenum = 0
     isfirst = True
     stream = import_stream.open_stream(sr)
     while True:
@@ -23,11 +23,11 @@ def cut_audio_fromstream(outpath, name):
             y = temp
             isfirst = False
         else:
-            y = y + temp
+            y = np.append(y, temp)
         segpoint = segmentation.multi_segmentation(y=y, sr=sr, frame_size=256, frame_shift=128,
                                                    is_only_have_voice=True)
         if len(segpoint) != 0:
-            save.save_wav_sequence(raw_y=y, sr=sr, segpoint=segpoint[:-1], path=outpath, name=name, startnum=filenub)
+            save.save_wav_sequence(raw_y=y, sr=sr, segpoint=segpoint[:-1], path=outpath, name=name, startnum=filenum)
             yt = int(segpoint[-1][0] * sr)
             y = temp[yt:]
-        filenub += len(segpoint) - 1
+        filenum += len(segpoint) - 1
