@@ -3,7 +3,7 @@ import numpy as np
 
 
 def record_wav(stream, time, fs):
-    buffer_size = 6400
+    buffer_size = 11025
     save_buffer = b""
     read_time_per_second = fs / buffer_size
     cnt = 0
@@ -19,7 +19,7 @@ def record_wav(stream, time, fs):
 
 def open_stream(fs):
     pa = pyaudio.PyAudio()
-    buffer_size = 6400
+    buffer_size = 11025
     stream = pa.open(
         format=pyaudio.paFloat32,
         channels=1,
