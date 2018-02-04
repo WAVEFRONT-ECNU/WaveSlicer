@@ -1,13 +1,15 @@
 import pyaudio
 import numpy as np
 
+buffer_size = 11025
+sampling_rate = 44100
 
-def record_wav(stream, time, fs):
-    buffer_size = 11025
+def record_wav(stream, time):
+    global buffer_size, sampling_rate
     save_buffer = b""
-    read_time_per_second = fs / buffer_size
+    read_time_per_second = sampling_rate / buffer_size
     cnt = 0
-    print("Start Record")
+    # print("Start Record")
     while cnt < time * read_time_per_second:
         str_data = stream.read(buffer_size)
         # print(str_data)
@@ -17,13 +19,15 @@ def record_wav(stream, time, fs):
     return wave_data
 
 
-def open_stream(fs):
+def open_stream(samplingrate=44100, buffersize=11025):
     pa = pyaudio.PyAudio()
-    buffer_size = 11025
+    global buffer_size, sampling_rate
+    buffer_size = buffersize
+    sampling_rate = samplingrate
     stream = pa.open(
         format=pyaudio.paFloat32,
         channels=1,
-        rate=fs,
+        rate=samplingrate,
         input=True,
-        frames_per_buffer=buffer_size)
+        frames_per_buffer=buffersize)
     return stream

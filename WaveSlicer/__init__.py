@@ -5,55 +5,67 @@ import WaveSlicer.save
 import numpy as np
 import threading
 import librosa
+from WaveSlicer.config import configs
+
+sr = configs['stream']['sampling_rate']
+bs = configs['stream']['buffer_size']
+bt = configs['stream']['buffer_time']
+frame_size = configs['segmentation']['frame_size']
+frame_shift = configs['segmentation']['frame_shift']
+savepath = ""
+savename = ""
+__streamsavepath = ""
+__streamsavename = ""
+__isfirst = True
+__filenum = 0
+__y = np.ndarray
 
 
-def cut_audio_fromfile(path, outpath, name):
-    y, sr, d = import_file.load_audio_file(path)
-    segpoint = segmentation.multi_segmentation(y=y, sr=sr, frame_size=256, frame_shift=128, is_only_have_voice=True)
-    save.save_wav_sequence(raw_y=y, sr=sr, segpoint=segpoint, path=outpath, name=name)
+def cut_audio_fromfile(filepath: str, savepath=savepath, savename=savename):
+    global frame_size, frame_shift
+    if savepath == "" or savename == "":
+        raise IOError("Undefined filepath and filename.")
+    y, sr, d = import_file.load_audio_file(filepath)
+    segpoint = segmentation.multi_segmentation(y=y, sr=sr, frame_size=frame_size, frame_shift=frame_shift,
+                                               is_only_have_voice=True)
+    save.save_wav_sequence(raw_y=y, sr=sr, segpoint=segpoint, path=savepath, name=savename)
     return
 
 
-def cut_audio_fromstream(outpath, name):
-    global sr
-    global __isfirst, temp, istempchanged, savepath, savename
-    savepath = outpath
-    savename = name
-    stream = import_stream.open_stream(sr)
+def cut_audio_fromstream(savepath=savepath, savename=savename):
+    global sr, bs, bt
+    global __isfirst, temp, istempchanged, __streamsavepath, __streamsavename
+    __streamsavepath = savepath
+    __streamsavename = savename
+    stream = import_stream.open_stream(samplingrate=sr, buffersize=bs)
     while True:
-        temp = import_stream.record_wav(stream, 5, sr)
+        temp = import_stream.record_wav(stream, bt)
         tread = threading.Thread(target=__cutstream(temp))
         tread.start()
-        savename += "a"
-
-
-__isfirst = True
-__filenum = 0
-y = np.ndarray
-sr = 44100
-savepath = ""
-savename = ""
+        # savename += "a"
 
 
 def __cutstream(temp):
     global __isfirst, __filenum
-    global y, sr, savepath, savename
+    global __y, sr, savepath, savename
+    global frame_size, frame_shift
     # print("temp" + str(len(temp)))
     if __isfirst:
-        y = temp
+        __y = temp
         __isfirst = False
     else:
-        y = np.append(y, temp)
+        __y = np.append(__y, temp)
     # print("B" + str(len(y)))
-    pt = savepath + str(__filenum) + ".wav"
-    librosa.output.write_wav(path=pt, y=y, sr=sr)
-    segpoint = segmentation.multi_segmentation(y=y, sr=sr, frame_size=1200, frame_shift=600,
+    # pt = savepath + str(__filenum) + ".wav"
+    # librosa.output.write_wav(path=pt, y=__y, sr=sr)
+    segpoint = segmentation.multi_segmentation(y=__y, sr=sr, frame_size=frame_size, frame_shift=frame_shift,
                                                is_only_have_voice=True)
     # print(str(segpoint))
     if len(segpoint) != 0:
-        save.save_wav_sequence(raw_y=y, sr=sr, segpoint=segpoint[:-1], path=savepath, name=savename, startnum=__filenum)
+        save.save_wav_sequence(raw_y=__y, sr=sr, segpoint=segpoint[:-1], path=savepath, name=savename,
+                               startnum=__filenum)
         # print(segpoint[-1][0])
         yt = int(segpoint[-1][0] * sr)
-        y = y[yt:]
+        __y = __y[yt:]
         # print("A" + str(len(y)))
         __filenum += len(segpoint) - 1
