@@ -1,8 +1,9 @@
 import pyaudio
 import numpy as np
+from WaveSlicer.config import configs
 
-buffer_size = 11025
-sampling_rate = 44100
+buffer_size = configs['stream']['buffer_size']
+buffer_time = configs['stream']['buffer_time']
 
 def record_wav(stream, time):
     global buffer_size, sampling_rate
