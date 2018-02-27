@@ -2,12 +2,12 @@
 
 configs = {
     'stream': {
-        'sampling_rate': 44100,
-        'buffer_size': 11025,
+        'sampling_rate': 16000,
+        'buffer_size': 8000,
         'buffer_time': 5
     },
     'segmentation': {
-        'frame_size': 1200,
-        'frame_shift': 600
+        'frame_size': 512,
+        'frame_shift': 128
     }
 }
