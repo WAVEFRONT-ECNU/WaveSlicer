@@ -20,7 +20,7 @@ def record_wav(stream, time):
     return wave_data
 
 
-def open_stream(samplingrate=44100, buffersize=11025):
+def open_stream(samplingrate=16000, buffersize=8000):
     pa = pyaudio.PyAudio()
     global buffer_size, sampling_rate
     buffer_size = buffersize
