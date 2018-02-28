@@ -2,7 +2,7 @@ import numpy as np
 import scipy.signal as signal
 
 
-def vad(x, framelen=None, sr=None, frameshift=None, plot=False):
+def vad(x, framelen=None, sr=None, frameshift=None):
     if sr is None:
         sr = 16000
     if framelen is None:
