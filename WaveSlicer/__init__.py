@@ -18,7 +18,7 @@ __streamsavename = ""
 __isfirst = True
 __filenum = 0
 __y = np.ndarray
-__isCFSrun = False
+__isCFSrun = True
 
 
 def cut_audio_fromfile(filepath: str, sp=save_path, sn=save_name):
