@@ -19,6 +19,7 @@ __streamsavename = ""
 __isfirst = True
 __filenum = 0
 __y = np.ndarray
+__isCFSrun = False
 
 
 def cut_audio_fromfile(filepath: str, sp=save_path, sn=save_name):
@@ -32,18 +33,31 @@ def cut_audio_fromfile(filepath: str, sp=save_path, sn=save_name):
     return
 
 
+def cut_audio_fromstream_in_new_thread(sp=save_path, sn=save_name):
+    global __isCFSrun
+    __isCFSrun = True
+    thread = threading.Thread(target=cut_audio_fromstream(sp=sp, sn=sn))
+    thread.start()
+
+
+def stop_cut_audio_fromstream():
+    global __isCFSrun
+    __isCFSrun = False
+
+
 def cut_audio_fromstream(sp=save_path, sn=save_name):
     global sampling_rate, buffer_size, buffer_time
     global __isfirst, temp, istempchanged, save_path, save_name
+    global __isCFSrun
     save_path = sp
     save_name = sn
     if save_path == "" or save_name == "":
         raise IOError("Undefined filepath and filename.")
     stream = import_stream.open_stream(samplingrate=sampling_rate, buffersize=buffer_size)
-    while True:
+    while __isCFSrun:
         temp = import_stream.record_wav(stream, buffer_time)
-        tread = threading.Thread(target=__cutstream(temp))
-        tread.start()
+        thread = threading.Thread(target=__cutstream(temp))
+        thread.start()
         # savename += "a"
 
 
