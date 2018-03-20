@@ -10,10 +10,9 @@ def record_wav(stream, time):
     save_buffer = b""
     read_time_per_second = sampling_rate / buffer_size
     cnt = 0
-    print("Start Record")
+    # print("Start Record")
     while cnt < time * read_time_per_second:
         str_data = stream.read(buffer_size)
-        # print(str_data)
         save_buffer += str_data
         cnt += 1
     wave_data = np.frombuffer(save_buffer, dtype=np.float32)

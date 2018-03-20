@@ -5,7 +5,6 @@ import librosa
 
 def compute_bic(mfcc_v, delta):
     m, n = mfcc_v.shape
-    # print(m, n)
 
     sigma0 = np.cov(mfcc_v).diagonal()
     eps = np.spacing(1)
@@ -73,7 +72,6 @@ def multi_segmentation(y, sr, frame_size=256, frame_shift=128, is_only_have_voic
     seg_point = np.insert(seg_point, 0, 0)
     seg_point = np.append(seg_point, len(y))
     rangeLoop = range(len(seg_point) - 1)
-    # cut_segpoint = []
     output_segpoint = []
 
     if is_only_have_voice:
@@ -82,16 +80,10 @@ def multi_segmentation(y, sr, frame_size=256, frame_shift=128, is_only_have_voic
             x1, x2 = vad.vad(temp, sr=sr, framelen=frame_size, frameshift=frame_shift)
             if len(x1) == 0 or len(x2) == 0:
                 continue
-            # elif seg_point[i + 1] == len(y):
-            # continue
             else:
-                # cut_segpoint.append(seg_point[i + 1])
                 output_segpoint.append([seg_point[i], seg_point[i + 1]])
-        # cut_segpoint.append(len(y))
-        # output_segpoint = cut_segpoint
     else:
         for i in rangeLoop:
             output_segpoint.append([seg_point[i], seg_point[i + 1]])
-        # output_segpoint = seg_point
 
     return (np.asarray(output_segpoint) / float(sr))
